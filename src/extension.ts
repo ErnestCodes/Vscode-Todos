@@ -6,19 +6,53 @@ import { SidebarProvider } from "./SidebarProvider";
 
 export function activate(context: vscode.ExtensionContext) {
   const sidebarProvider = new SidebarProvider(context.extensionUri);
+
+  const item = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Right
+  );
+  item.text = "$(checklist) Add Todo";
+  item.command = "todos.addTodo";
+  item.show();
+
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider("todos-sidebar", sidebarProvider)
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("todos.refresh", () => {
-      HelloWorldPanel.kill();
-      HelloWorldPanel.createOrShow(context.extensionUri);
-      setTimeout(() => {
-        vscode.commands.executeCommand(
-          "workbench.action.webview.openDeveloperTools"
-        );
-      }, 500);
+    vscode.commands.registerCommand("todos.addTodo", () => {
+      const { activeTextEditor } = vscode.window;
+
+      if (!activeTextEditor) {
+        vscode.window.showInformationMessage("No active Text Editor");
+        return;
+      }
+
+      const text = activeTextEditor.document.getText(
+        activeTextEditor.selection
+      );
+
+      // vscode.window.showInformationMessage("Text: " + text);
+
+      sidebarProvider._view?.webview.postMessage({
+        type: "add-Todo",
+        value: text,
+      });
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("todos.refresh", async () => {
+      // HelloWorldPanel.kill();
+      // HelloWorldPanel.createOrShow(context.extensionUri);
+      await vscode.commands.executeCommand("workbench.action.closeSidebar");
+      await vscode.commands.executeCommand(
+        "workbench.view.extension.todos-sidebar-view"
+      );
+      // setTimeout(() => {
+      //   vscode.commands.executeCommand(
+      //     "workbench.action.webview.openDeveloperTools"
+      //   );
+      // }, 500);
     })
   );
 

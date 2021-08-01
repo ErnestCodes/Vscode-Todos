@@ -13,6 +13,7 @@
     "onCommand:todos.helloWorld",
     "onCommand:todos.webview",
     "onCommand:todos.refresh",
+    "onCommand:todos.addTodo",
     "onView:todos-sidebar"
   ],
   "main": "./dist/extension.js",
@@ -50,6 +51,11 @@
       {
         "command": "todos.refresh",
         "title": "Refresh",
+        "category": "todos"
+      },
+      {
+        "command": "todos.addTodo",
+        "title": "AddTodo From Selection",
         "category": "todos"
       }
     ]
